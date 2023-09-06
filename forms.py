@@ -6,7 +6,7 @@ from .models import Advertisement
 class AdvertisementForm(forms.ModelForm):
     class Meta:
         model = Advertisement
-        fields = ["title", "description", "image", "price", "auction"]
+        fields = [ "title", "description", "image", "price", "auction"]
         widgets = {
             'title' : forms.TextInput(attrs={'class' : 'form-control form-control-lg'}),
             'description' : forms.Textarea(attrs={'class' : 'form-control form-control-lg'}),

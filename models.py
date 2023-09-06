@@ -15,7 +15,7 @@ class Advertisement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, verbose_name="пользователь", on_delete=models.CASCADE)
-    image = models.ImageField("изображение", upload_to='advertisements/')
+    image = models.ImageField("изображение", upload_to='advertisements/', blank=True)
 
     
     def __str__(self):
@@ -63,7 +63,6 @@ class Advertisement(models.Model):
 
 
 #http://127.0.0.1:8000/admin
-    
     
     
 
