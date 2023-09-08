@@ -1,37 +1,50 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Advertisement
-from .forms import AdvertisementForm
 from django.urls import reverse, reverse_lazy
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
-
-
-def index(request):
-    advertisements = Advertisement.objects.all()
-    context = {'advertisement': advertisements}
-    return render(request, "app_advertisement/index.html", context)
-
-
-def top_sellers(request):
-    return render(request, "app_advertisement/top-sellers.html")
+from .forms import ExtendedUserCreationForm
 
 
 
 @login_required(login_url=reverse_lazy('profile'))
-def advertisement_post(request):
-    if request.method == 'POST':
-        form = AdvertisementForm(request.POST, request.FILES)
+def profile_view(request):
+    return render(request, 'app_auth/profile.html')
+
+
+def register_view(request):
+    if request.method == "POST":
+        form = ExtendedUserCreationForm(request.POST)
         if form.is_valid():
-            advertisement = form.save(commit=False)
-            advertisement.user = request.user
-            advertisement.save()
-            url = reverse('main-page')
-            return redirect(url)
+            user = form.save()
+            user = authenticate(username=user.username, password=request.POST['password1'])
+            login(request, user=user)
+            return redirect(reverse('profile'))
     else:
-        form = AdvertisementForm()
+        form = ExtendedUserCreationForm()
     context = {'form' : form}
-    return render(request, 'app_advertisement/advertisement-post.html', context)
+    return render(request, "app_auth/register.html", context)
+
+
+
+def login_view(request):
+    redirect_url = reverse('profile')
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return redirect(redirect_url)
+        else:
+            return render(request, 'app_auth/login.html')
+    username = request.POST['username']
+    pasword = request.POST['password']
+    user = authenticate(request, username=username, pasword=pasword)
+    if user is not None:
+        login(request, user)
+        return redirect(redirect_url)
+    return render(request, 'app_auth/login.html', {"error" : "Пользователь не найден"})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse('login'))
 
 
 
